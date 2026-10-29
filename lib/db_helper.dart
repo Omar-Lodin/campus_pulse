@@ -1,6 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-
+import 'package:festival_pocket/models/attendance_log.dart';
 import 'package:festival_pocket/models/event.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -39,7 +37,7 @@ CREATE TABLE attendance_log (
   status TEXT NOT NULL
     CHECK(status IN ('planned', 'attended', 'cancelled')),
   personalNote TEXT NOT NULL DEFAULT '',
-  FOREIGN KEY (eventID) REFERENCES events(id) ON DELETE CASCADE
+  FOREIGN KEY (eventID) REFERENCES event(id) ON DELETE CASCADE
   )
 ''');
 }
@@ -47,6 +45,7 @@ CREATE TABLE attendance_log (
       _database = db;
     return db;
 }
+//CRUD operations for Event table
 static Future<List<Event>> getEvents() async{
     final db = await _getDatabase();
     final result = await db.query('event');
@@ -67,4 +66,30 @@ static Future<List<Event>> getEvents() async{
     final db = await _getDatabase();
     return await db.delete('event', where: 'id = ?', whereArgs: [id]);
   }
+
+  //CRUD operations for AttendanceLog
+  static Future<List<AttendanceLog>> getAttendanceLog() async {
+    final db = await _getDatabase();
+    final result = await db.query('attendance_log');
+    return result.map((row) => AttendanceLog.fromMap(row)).toList();
+  }
+
+  static Future<int> addAttendanceLog(AttendanceLog log) async {
+    final db = await _getDatabase();
+    return db.insert('attendance_log', log.toMap()..remove('id'));
+  }
+
+  static Future<int> updateAttendanceLog(AttendanceLog log) async {
+    final db = await _getDatabase();
+    return await db.update('attendance_log', log.toMap(), where: 'id = ?', whereArgs: [log.id],
+    );
+  }
+
+  static Future<int> deleteAttendanceLog(int id) async {
+    final db = await _getDatabase();
+    return await db.delete(
+      'attendance_log', where: 'id = ?', whereArgs: [id]
+    );
+  }
 }
+
