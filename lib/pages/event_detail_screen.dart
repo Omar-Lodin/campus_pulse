@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'event.dart';
+import '/models/event.dart';
 
 class EventDetailScreen extends StatelessWidget {
   final CampusEvent event;

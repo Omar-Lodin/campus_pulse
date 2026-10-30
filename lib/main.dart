@@ -1,6 +1,5 @@
-
+import 'package:festival_pocket/pages/main_page.dart';
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
 
 void main() {
   runApp(const CampusPulseApp());
@@ -17,7 +16,7 @@ class CampusPulseApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomeScreen(),
+      home: const MainPage(),
     );
   }
 }
