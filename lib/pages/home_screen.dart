@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Record attendance
-  void markAttendance(CampusEvent event) async {
+  Future<void> markAttendance(CampusEvent event) async {
     if (event.id == null) return;
 
     await DatabaseHelper.addAttendance(event.id!);
