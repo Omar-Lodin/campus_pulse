@@ -5,7 +5,13 @@ import 'package:path/path.dart';
 class DatabaseHelper {
   static Database? _database;
 
+  static const List<String> eventCategories = [
+    'Sports', 'Movies', 'Art', 'Music', 'Social', 'Academic', 
+    'Volunteering', 'Gaming', 'Food', 'Career', 'Technology'
+  ];
+
   static Future<Database> get database async {
+  
     if (_database != null) return _database!;
 
     String dbPath = await getDatabasesPath();
