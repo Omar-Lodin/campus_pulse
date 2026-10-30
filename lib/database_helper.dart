@@ -51,7 +51,10 @@ class DatabaseHelper {
 
   static Future<List<Map<String, Object?>>> getEvents() async {
     final db = await database;
-    return db.query('events', orderBy: 'date ASC');
+    return db.query('events', 
+    where: 'id NOT IN (SELECT event_id FROM attendance)',
+    orderBy: 'date ASC',
+    );
   }
 
   static Future<int> addEvent(Map<String, Object?> event) async {

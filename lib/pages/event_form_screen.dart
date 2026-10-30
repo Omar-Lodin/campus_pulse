@@ -1,14 +1,12 @@
-
+import 'package:festival_pocket/database_helper.dart';
 import 'package:flutter/material.dart';
+
 import '/models/event.dart';
 
 class EventFormScreen extends StatefulWidget {
   final CampusEvent? event;
 
-  const EventFormScreen({
-    super.key,
-    this.event,
-  });
+  const EventFormScreen({super.key, this.event});
 
   @override
   State<EventFormScreen> createState() {
@@ -61,9 +59,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
           eventDate.day != day ||
           eventDate.year != year) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please enter a valid date'),
-          ),
+          const SnackBar(content: Text('Please enter a valid date')),
         );
         return;
       }
@@ -115,9 +111,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.event == null ? 'Create Event' : 'Edit Event',
-        ),
+        title: Text(widget.event == null ? 'Create Event' : 'Edit Event'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -169,41 +163,25 @@ class _EventFormScreenState extends State<EventFormScreen> {
               ),
               const SizedBox(height: 12),
               const Text('Category'),
-              Wrap(
-                spacing: 8,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        category = 'Academic';
-                      });
-                    },
-                    child: const Text('Academic'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        category = 'Social';
-                      });
-                    },
-                    child: const Text('Social'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        category = 'Sports';
-                      });
-                    },
-                    child: const Text('Sports'),
-                  ),
-                ],
+              DropdownButton<String>(
+                value: category,
+                isExpanded: true,
+                items: DatabaseHelper.eventCategories.map((item) {
+                  return DropdownMenuItem<String>(
+                    value: item,
+                    child: Text(item),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value == null) return;
+
+                  setState(() {
+                    category = value;
+                  });
+                },
               ),
-              Text('Selected: $category'),
               const SizedBox(height: 16),
-              const Text(
-                'Event Date',
-                style: TextStyle(fontSize: 18),
-              ),
+              const Text('Event Date', style: TextStyle(fontSize: 18)),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -216,13 +194,9 @@ class _EventFormScreenState extends State<EventFormScreen> {
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {
-                        int? month = int.tryParse(
-                          (value ?? '').trim(),
-                        );
+                        int? month = int.tryParse((value ?? '').trim());
 
-                        if (month == null ||
-                            month < 1 ||
-                            month > 12) {
+                        if (month == null || month < 1 || month > 12) {
                           return 'Invalid month';
                         }
 
@@ -240,13 +214,9 @@ class _EventFormScreenState extends State<EventFormScreen> {
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {
-                        int? day = int.tryParse(
-                          (value ?? '').trim(),
-                        );
+                        int? day = int.tryParse((value ?? '').trim());
 
-                        if (day == null ||
-                            day < 1 ||
-                            day > 31) {
+                        if (day == null || day < 1 || day > 31) {
                           return 'Invalid day';
                         }
 
@@ -264,13 +234,9 @@ class _EventFormScreenState extends State<EventFormScreen> {
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {
-                        int? year = int.tryParse(
-                          (value ?? '').trim(),
-                        );
+                        int? year = int.tryParse((value ?? '').trim());
 
-                        if (year == null ||
-                            year < 2020 ||
-                            year > 2100) {
+                        if (year == null || year < 2020 || year > 2100) {
                           return 'Invalid year';
                         }
 
@@ -285,10 +251,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
                 onPressed: saveEvent,
                 child: const Text('Save Event'),
               ),
-              TextButton(
-                onPressed: resetForm,
-                child: const Text('Reset'),
-              ),
+              TextButton(onPressed: resetForm, child: const Text('Reset')),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
