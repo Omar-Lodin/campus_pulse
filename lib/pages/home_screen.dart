@@ -15,31 +15,27 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  
   String selectedCategory = 'All';
-  double groupSize = 5;
 
   List<CampusEvent> events = [];
-  
 
   @override
   void initState() {
     super.initState();
     loadData();
   }
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('Campus Pulse'),
-    ),
-    body: buildEventsPage(),
-    floatingActionButton: FloatingActionButton(
-      onPressed: addEvent,
-      child: const Icon(Icons.add),
-    ),
-  );
-}
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Campus Pulse')),
+      body: buildEventsPage(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: addEvent,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
 
   // Load saved events and attendance
   Future<void> loadData() async {
@@ -49,12 +45,9 @@ Widget build(BuildContext context) {
 
     setState(() {
       events = eventRows.map((row) => CampusEvent.fromMap(row)).toList();
-
-      
     });
   }
 
-  
   // Add a new event
   void addEvent() async {
     CampusEvent? newEvent = await Navigator.push<CampusEvent>(
@@ -145,44 +138,29 @@ Widget build(BuildContext context) {
       children: [
         Padding(
           padding: const EdgeInsets.all(12),
-          child: Wrap(
-            spacing: 8,
-            children: [
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    selectedCategory = 'All';
-                  });
-                },
-                child: const Text('All'),
-              ),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    selectedCategory = 'Academic';
-                  });
-                },
-                child: const Text('Academic'),
-              ),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    selectedCategory = 'Social';
-                  });
-                },
-                child: const Text('Social'),
-              ),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    selectedCategory = 'Sports';
-                  });
-                },
-                child: const Text('Sports'),
-              ),
-            ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: ['All', ...DatabaseHelper.eventCategories].map((
+                category,
+              ) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text(category),
+                    selected: selectedCategory == category,
+                    onSelected: (selected) {
+                      setState(() {
+                        selectedCategory = category;
+                      });
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         ),
+
         Expanded(
           child: ListView.builder(
             itemCount: filteredEvents.length,
@@ -216,6 +194,4 @@ Widget build(BuildContext context) {
       ),
     );
   }
-
-
 }
