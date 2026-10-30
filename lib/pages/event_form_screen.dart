@@ -20,6 +20,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final locationController = TextEditingController();
+  final notesController = TextEditingController();
 
   final monthController = TextEditingController();
   final dayController = TextEditingController();
@@ -39,6 +40,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
       locationController.text = widget.event!.location;
       category = widget.event!.category;
       date = widget.event!.date;
+      notesController.text = widget.event!.notes;
     }
 
     monthController.text = date.month.toString();
@@ -245,6 +247,16 @@ class _EventFormScreenState extends State<EventFormScreen> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 14,),
+              TextFormField(
+                controller: notesController,
+                decoration: const InputDecoration(
+                  labelText: 'Notes (optional)',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 5,
+                maxLength: 200,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
