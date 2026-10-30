@@ -28,6 +28,33 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
+  Future<void> confirmDeleteAttendance(int id) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete History Entry'),
+          content: const Text('Remove selected record from History?'),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Delete'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed != true) return;
+    await DatabaseHelper.deleteAttendance(id);
+
+    if (!mounted) return;
+    await loadHistory();
+  }
+
   @override
   // Attendance history page
   Widget build(BuildContext context) {
@@ -47,6 +74,10 @@ class _HistoryPageState extends State<HistoryPage> {
                 leading: const Icon(Icons.check_circle),
                 title: Text(record['event_name'] as String),
                 subtitle: const Text('Attended'),
+                trailing: const Icon(Icons.delete_outline),
+                onTap: () {
+                  confirmDeleteAttendance(record['id'] as int);
+                },
               );
             },
           ),
