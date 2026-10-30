@@ -77,13 +77,30 @@ class DatabaseHelper {
     );
   }
 
-  static Future<int> addAttendance(int eventId) async {
+  static Future<bool> addAttendance(int eventId) async {
     final db = await database;
 
-    return db.insert('attendance', {
-      'event_id': eventId,
-      'attended_date': DateTime.now().toIso8601String(),
+    return db.transaction((transaction) async {
+      final existing = await transaction.query(
+        'attendance', where:'event_id = ?', whereArgs: [eventId], limit: 1,
+      );
+      if (existing.isNotEmpty) {
+        return false;
+      }
+      await transaction.insert('attendance',{
+        'event_id': eventId,
+        'attended_date':DateTime.now().toIso8601String(),
+      });
+      return true;
     });
+  }
+
+  static Future<int> deleteAttendance(int id) async {
+    final db = await database;
+
+    return db.delete(
+      'attendance', where: 'id = ?', whereArgs: [id],
+    );
   }
 
   static Future<List<Map<String, Object?>>> getAttendance() async {
