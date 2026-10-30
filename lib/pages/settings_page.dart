@@ -39,26 +39,63 @@ class _SettingsPageState extends State<SettingsPage> {
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
               'Make changes to your preferences',
               style: TextStyle(fontSize: 24),
             ),
             const SizedBox(height: 20),
-            Text('Default Group Size: ${groupSize.round()}'),
-            Slider(
-              value: groupSize,
-              min: 1,
-              max: 20,
-              divisions: 19,
-              onChanged: (value) {
-                setState(() {
-                  groupSize = value;
-                });
-              },
-              onChangeEnd: (value) async {
-                await saveGroupSize(value);
-              },
+
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Theme.of(context).colorScheme.outline),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Group Size', style: TextStyle(fontSize: 20)),
+                  const SizedBox(height: 12),
+                  Text('Default Group Size: ${groupSize.round()}'),
+                  Slider(
+                    value: groupSize,
+                    min: 1,
+                    max: 20,
+                    divisions: 19,
+                    onChanged: (value) {
+                      setState(() {
+                        groupSize = value;
+                      });
+                    },
+                    onChangeEnd: (value) async {
+                      await saveGroupSize(value);
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Preferred Interests',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  const SizedBox(height: 12),
+                  // Add interest controls here later.
+                ],
+              ),
             ),
           ],
         ),
