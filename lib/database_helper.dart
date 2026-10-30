@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     _database = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE events (
@@ -28,7 +28,8 @@ class DatabaseHelper {
             description TEXT NOT NULL,
             location TEXT NOT NULL,
             category TEXT NOT NULL,
-            date TEXT NOT NULL
+            date TEXT NOT NULL,
+            notes TEXT NOT NULL DEFAULT ''
           )
         ''');
 
@@ -40,6 +41,14 @@ class DatabaseHelper {
             FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE
           )
         ''');
+      },
+
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(
+            "ALTER TABLE events ADD COLUMN notes TEXT NOT NULL DEFAULT ''",
+          );
+        }
       },
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
