@@ -124,13 +124,27 @@ class DatabaseHelper {
   static Future<List<Map<String, Object?>>> getAttendance() async {
     final db = await database;
 
-    return db.rawQuery('''
-      SELECT attendance.id, attendance.event_id,
-             attendance.attended_date,
-             events.name AS event_name
-      FROM attendance
-      JOIN events ON attendance.event_id = events.id
-      ORDER BY attendance.id DESC
-    ''');
+    return db.query(
+      'attendance JOIN events ON attendance.event_id = events.id',
+      columns: [
+        'attendance.id',
+        'attendance.event_id',
+        'attendance.attended_date',
+        'events.name AS event_name',
+      ],
+      orderBy: 'attendance.id DESC',
+    );
+  }
+
+  static Future<Map<String, Object?>?> getEventById(int id) async {
+    final db = await database;
+
+    final results = await db.query(
+      'events',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1, 
+    );
+    return results.isEmpty ? null : results.first;
   }
 }

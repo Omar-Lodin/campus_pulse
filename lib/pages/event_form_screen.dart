@@ -73,6 +73,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
         location: locationController.text.trim(),
         category: category,
         date: eventDate,
+        notes: notesController.text.trim(),
       );
 
       Navigator.pop(context, event);
@@ -84,7 +85,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
     nameController.clear();
     descriptionController.clear();
     locationController.clear();
-
+    notesController.clear();
     DateTime today = DateTime.now();
 
     monthController.text = today.month.toString();
@@ -105,7 +106,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
     monthController.dispose();
     dayController.dispose();
     yearController.dispose();
-
+    notesController.dispose();
     super.dispose();
   }
 

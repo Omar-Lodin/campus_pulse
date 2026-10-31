@@ -1,3 +1,6 @@
+import 'package:festival_pocket/models/event.dart';
+import 'package:festival_pocket/pages/event_detail_screen.dart';
+import 'package:festival_pocket/pages/event_form_screen.dart';
 import 'package:flutter/material.dart';
 
 import '/database_helper.dart';
@@ -85,6 +88,52 @@ class _HistoryPageState extends State<HistoryPage> {
     await loadHistory();
   }
 
+  Future<void> viewEventDetails(int eventId) async {
+    final eventMap = await DatabaseHelper.getEventById(eventId);
+
+    if (!mounted || eventMap == null) return;
+
+    final event = CampusEvent.fromMap(eventMap);
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (detailsContext) {
+          return EventDetailScreen(
+            event: event,
+            onAttend: () {
+              ScaffoldMessenger.of(detailsContext).showSnackBar(
+                const SnackBar(
+                  content: Text('This event is already marked as attended'),
+                ),
+              );
+            },
+            onEdit: () async {
+              final updatedEvent = await Navigator.push<CampusEvent>(
+                detailsContext,
+                MaterialPageRoute(
+                  builder: (context) => EventFormScreen(event: event),
+                ),
+              );
+              if (updatedEvent == null) return;
+
+              await DatabaseHelper.updateEvent(eventId, updatedEvent.toMap());
+              if (!detailsContext.mounted) return;
+              Navigator.pop(detailsContext);
+            },
+            onDelete: () async {
+              await DatabaseHelper.deleteEvent(eventId);
+              if (!detailsContext.mounted) return;
+              Navigator.pop(detailsContext);
+            },
+          );
+        },
+      ),
+    );
+    if (!mounted) return;
+    await loadHistory();
+  }
+
   @override
   // Attendance history page
   Widget build(BuildContext context) {
@@ -94,11 +143,25 @@ class _HistoryPageState extends State<HistoryPage> {
         itemCount: attendanceHistory.length,
         itemBuilder: (context, index) {
           Map<String, Object?> record = attendanceHistory[index];
-
-          return ListTile(
+          return Card(
+            margin: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 6,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.outline,
+              width: 1,
+              ),
+            ),
+          child: ListTile(
             leading: const Icon(Icons.check_circle),
             title: Text(record['event_name'] as String),
             subtitle: const Text('Attended'),
+            onTap: () {
+              viewEventDetails(record['event_id'] as int);
+            },
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -120,6 +183,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
               ],
             ),
+          ),
           );
         },
       ),
