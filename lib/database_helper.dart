@@ -36,8 +36,8 @@ class DatabaseHelper {
             location TEXT NOT NULL,
             category TEXT NOT NULL,
             date TEXT NOT NULL,
-            notes TEXT NOT NULL DEFAULT ''
-            capacity INTEGER
+            notes TEXT NOT NULL DEFAULT '',
+            capacity INTEGER,
             is_planned INTEGER NOT NULL DEFAULT 0
           )
         ''');
