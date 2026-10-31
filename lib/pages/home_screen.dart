@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '/database_helper.dart';
 import '/models/event.dart';
@@ -20,6 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int attendedCount = 0;
   List<CampusEvent> events = [];
+
+  CampusEvent? suggestedEvent;
+  int suggestedCategoryCount = 0;
+  bool suggestedMatches = false;
 
   @override
   void initState() {
@@ -43,11 +48,34 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> loadData() async {
     final eventRows = await DatabaseHelper.getEvents();
     final count = await DatabaseHelper.getAttendanceCount();
+    final categoryCounts = await DatabaseHelper.getAttendedCategoryCounts();
+    final prefs = await SharedPreferences.getInstance();
+    final preferredInterests = [
+      prefs.getString('selectedInterest1'),
+      prefs.getString('selectedInterest2'),
+      prefs.getString('selectedInterest3'),
+    ].whereType<String>().where((value) => value.isNotEmpty).toSet();
+    final loadedEvents = eventRows
+        .map((row) => CampusEvent.fromMap(row))
+        .toList();
+    final suggestion = selectSuggestedEvent(
+      loadedEvents,
+      categoryCounts,
+      preferredInterests,
+    );
     if (!mounted) return;
 
     setState(() {
-      events = eventRows.map((row) => CampusEvent.fromMap(row)).toList();
+      events = loadedEvents;
       attendedCount = count;
+      suggestedEvent = suggestion;
+      suggestedCategoryCount = suggestion == null
+          ? 0
+          : categoryCounts[suggestion.category] ?? 0;
+
+      suggestedMatches =
+          suggestion != null &&
+          preferredInterests.contains(suggestion.category);
     });
   }
 
@@ -134,6 +162,29 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  CampusEvent? selectSuggestedEvent(
+    List<CampusEvent> availableEvents,
+    Map<String, int> categoryCounts,
+    Set<String> preferredInterests,
+  ) {
+    int score(CampusEvent event) {
+      final attendScore = categoryCounts[event.category] ?? 0;
+      final interestScore = preferredInterests.contains(event.category) ? 2 : 0;
+      return attendScore + interestScore;
+    }
+
+    final candidates = availableEvents.where((event) {
+      return !event.isPlanned && score(event) > 0;
+    }).toList();
+    candidates.sort((a, b) {
+      final comparison = score(b).compareTo(score(a));
+
+      if (comparison != 0) return comparison;
+      return a.date.compareTo(b.date);
+    });
+    return candidates.isEmpty ? null : candidates.first;
+  }
+
   // Events page
   Widget buildEventsPage() {
     List<CampusEvent> filteredEvents = [];
@@ -152,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                'Events Planned: ${events.where((event)=>event.isPlanned).length}',
+                'Events Planned: ${events.where((event) => event.isPlanned).length}',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -168,9 +219,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-
+        const SizedBox(height: 6),
+        buildSuggestedEventCard(),
         Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal:12, vertical: 3),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -201,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
               CampusEvent event = filteredEvents[index];
 
               return Card(
-                margin: const EdgeInsets.all(8),
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: ListTile(
                   title: Row(
                     children: [
@@ -234,6 +286,62 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: addEvent,
         child: const Text('Create New Event'),
       ),
+    );
+  }
+
+  Widget buildSuggestedEventCard() {
+    final event = suggestedEvent;
+
+    if (event == null) {
+      return const Padding(
+        padding: EdgeInsets.all(6),
+        child: Text('No events to suggest.'),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Card(
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Theme.of(context).colorScheme.primary),
+          ),
+          child: ListTile(
+            leading: const Icon(Icons.auto_awesome_motion_outlined),
+            title: Row(
+              //crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: Text(event.name)),
+                const Chip(label: Text('Suggested')),
+              ],
+            ),
+            subtitle: Text(
+              '${event.category} - ${event.location}\n'
+              '${event.date.month}/${event.date.day}/${event.date.year}'
+              ' at ${TimeOfDay.fromDateTime(event.date).format(context)}',
+            ),
+            trailing: const Icon(Icons.arrow_forward),
+            onTap: () {
+              openEventDetails(event);
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (suggestedCategoryCount > 0)
+                Text(
+                  'You\'ve already attended $suggestedCategoryCount event(s) in ${event.category}.',
+                ),
+              if (suggestedMatches)
+                const Text('This event matches a preferred interest.'),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -4,23 +4,36 @@ import '/pages/history_page.dart';
 import '/pages/settings_page.dart';
 
 class MainPage extends StatefulWidget{
-  const MainPage ({super.key});
+  final bool isDarkMode;
+  final ValueChanged<bool> onThemeChanged;
 
+
+  const MainPage ({
+    super.key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+  });
+    
   @override
   State<MainPage> createState()=> _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
   int currentPage = 0;
-  final List<Widget> pages = [
-    HomeScreen(),
-    HistoryPage(),
-    SettingsPage(),
-  ];
+  
 
-
+//creates and maintains navigation bar
 @override
   Widget build(BuildContext context) {
+
+    final pages = [
+    const HomeScreen(),
+    const HistoryPage(),
+    SettingsPage(
+      isDarkMode : widget.isDarkMode,
+      onThemeChanged: widget.onThemeChanged,
+    ),
+  ];
     return Scaffold(
       body: pages[currentPage],
       bottomNavigationBar: BottomNavigationBar(

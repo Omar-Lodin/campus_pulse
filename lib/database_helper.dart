@@ -178,4 +178,20 @@ class DatabaseHelper {
       whereArgs: [eventId],
     );
   }
+
+  static Future<Map<String, int>> getAttendedCategoryCounts() async {
+    final db = await database;
+
+    final rows = await db.query(
+      'attendance JOIN events ON attendance.event_id = events.id',
+      columns: [
+        'events.category AS category',
+        'COUNT(DISTINCT attendance.event_id) AS total',
+      ],
+      groupBy: 'events.category',
+    );
+    return {
+      for (final row in rows) row['category'] as String: row['total'] as int,
+    };
+  }
 }
