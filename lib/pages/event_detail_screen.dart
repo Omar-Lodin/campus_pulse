@@ -72,6 +72,10 @@ class EventDetailScreen extends StatelessWidget {
               'Date: ${event.date.month}/'
               '${event.date.day}/${event.date.year}',
             ),
+            if (event.capacity != null) ...[
+              const SizedBox(height: 8),
+              Text('Capacity: ${event.capacity} people'),
+            ],
             const SizedBox(height: 8),
             Text('Event Start Time: ${TimeOfDay.fromDateTime(event.date).format(context)}',
             ),

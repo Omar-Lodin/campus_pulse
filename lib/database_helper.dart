@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     _database = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE events (
@@ -30,6 +30,7 @@ class DatabaseHelper {
             category TEXT NOT NULL,
             date TEXT NOT NULL,
             notes TEXT NOT NULL DEFAULT ''
+            capacity INTEGER
           )
         ''');
 
@@ -49,10 +50,17 @@ class DatabaseHelper {
             "ALTER TABLE events ADD COLUMN notes TEXT NOT NULL DEFAULT ''",
           );
         }
+        if (oldVersion < 3) {
+        await db.execute(
+          'ALTER TABLE events ADD COLUMN capacity INTEGER'
+        );
+      }
       },
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
+
+      
     );
 
     return _database!;

@@ -141,11 +141,27 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.all(12),
-          child: Text(
-            'Events Attended: $attendedCount',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                'Events Planned: ${events.length}',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'Events Attended: $attendedCount',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
+
         Padding(
           padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(

@@ -21,7 +21,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
   final descriptionController = TextEditingController();
   final locationController = TextEditingController();
   final notesController = TextEditingController();
-
+  final capacityController = TextEditingController();
   final monthController = TextEditingController();
   final dayController = TextEditingController();
   final yearController = TextEditingController();
@@ -44,6 +44,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
       date = widget.event!.date;
       notesController.text = widget.event!.notes;
       selectedTime = TimeOfDay.fromDateTime(widget.event!.date);
+      capacityController.text = widget.event!.capacity?.toString() ?? '';
     }
 
     monthController.text = date.month.toString();
@@ -83,6 +84,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
         category: category,
         date: eventDate,
         notes: notesController.text.trim(),
+        capacity: int.tryParse(capacityController.text.trim()),
       );
 
       Navigator.pop(context, event);
@@ -95,6 +97,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
     descriptionController.clear();
     locationController.clear();
     notesController.clear();
+    capacityController.clear();
     DateTime today = DateTime.now();
 
     monthController.text = today.month.toString();
@@ -116,6 +119,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
     dayController.dispose();
     yearController.dispose();
     notesController.dispose();
+    capacityController.dispose();
     super.dispose();
   }
 
@@ -181,6 +185,25 @@ class _EventFormScreenState extends State<EventFormScreen> {
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Please enter a location';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: capacityController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Capacity (optional)',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  final text = (value ?? '').trim();
+                  if(text.isEmpty) return null;
+                  final capacity = int.tryParse(text);
+
+                  if (capacity == null || capacity < 1) {
+                    return 'Only positive whole numbers allowed';
                   }
                   return null;
                 },
