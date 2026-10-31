@@ -3,7 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  final bool isDarkMode;
+  final ValueChanged<bool> onThemeChanged;
+
+  const SettingsPage({
+    super.key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+  });
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -45,7 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
     if (selectedInterest2 != null) {
       await prefs.setString('selectedInterest2', selectedInterest2!);
     }
-    if (selectedInterest1 != null) {
+    if (selectedInterest3 != null) {
       await prefs.setString('selectedInterest3', selectedInterest3!);
     }
   }
@@ -92,7 +99,23 @@ class _SettingsPageState extends State<SettingsPage> {
               style: TextStyle(fontSize: 24),
             ),
             const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
 
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SwitchListTile(
+                title: const Text('Dark Mode'),
+                secondary: const Icon(Icons.dark_mode),
+                value: widget.isDarkMode,
+                onChanged: widget.onThemeChanged,
+              ),
+            ),
+            const SizedBox(height: 6),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -105,7 +128,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Group Size', style: TextStyle(fontSize: 20)),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Text('Default Group Size: ${groupSize.round()}'),
                   Slider(
                     value: groupSize,
@@ -125,7 +148,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 6),
 
             Container(
               padding: const EdgeInsets.all(16),

@@ -308,7 +308,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
                   labelText: 'Notes (optional)',
                   border: OutlineInputBorder(),
                 ),
-                maxLines: 5,
+                maxLines: 3,
                 maxLength: 200,
               ),
               const SizedBox(height: 20),
