@@ -73,6 +73,9 @@ class EventDetailScreen extends StatelessWidget {
               '${event.date.day}/${event.date.year}',
             ),
             const SizedBox(height: 8),
+            Text('Event Start Time: ${TimeOfDay.fromDateTime(event.date).format(context)}',
+            ),
+            const SizedBox(height: 8),
             if(event.notes.isNotEmpty) ...[
               const SizedBox(height: 16),
               const Text(

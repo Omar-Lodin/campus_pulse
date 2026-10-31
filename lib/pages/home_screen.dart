@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '/database_helper.dart';
 import '/models/event.dart';
@@ -17,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String selectedCategory = 'All';
 
+  int attendedCount = 0;
   List<CampusEvent> events = [];
 
   @override
@@ -40,11 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
   // Load saved events and attendance
   Future<void> loadData() async {
     final eventRows = await DatabaseHelper.getEvents();
-
+    final count = await DatabaseHelper.getAttendanceCount();
     if (!mounted) return;
 
     setState(() {
       events = eventRows.map((row) => CampusEvent.fromMap(row)).toList();
+      attendedCount = count;
     });
   }
 
@@ -138,6 +141,13 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.all(12),
+          child: Text(
+            'Events Attended: $attendedCount',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -170,8 +180,17 @@ class _HomeScreenState extends State<HomeScreen> {
               return Card(
                 margin: const EdgeInsets.all(8),
                 child: ListTile(
-                  title: Text(event.name),
-                  subtitle: Text('${event.category} - ${event.location}'),
+                  title: Row(
+                    children: [
+                      Expanded(child: Text(event.name)),
+                      const Chip(label: Text('Planned')),
+                    ],
+                  ),
+                  subtitle: Text(
+                    '${event.category} - ${event.location}\n'
+                    '${event.date.month}/${event.date.day}/${event.date.year}'
+                    ' at ${TimeOfDay.fromDateTime(event.date).format(context)}',
+                  ),
                   trailing: const Icon(Icons.arrow_forward),
                   onTap: () {
                     openEventDetails(event);

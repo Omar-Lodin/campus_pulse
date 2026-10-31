@@ -131,6 +131,7 @@ class DatabaseHelper {
         'attendance.event_id',
         'attendance.attended_date',
         'events.name AS event_name',
+        'events.date AS event_date',
       ],
       orderBy: 'attendance.id DESC',
     );
@@ -146,5 +147,15 @@ class DatabaseHelper {
       limit: 1, 
     );
     return results.isEmpty ? null : results.first;
+  }
+
+  static Future<int> getAttendanceCount() async {
+    final db = await database;
+
+    final results = await db.query(
+      'attendance',
+      columns: ['COUNT(*) AS total'],
+    );
+    return results.first['total'] as int;
   }
 }

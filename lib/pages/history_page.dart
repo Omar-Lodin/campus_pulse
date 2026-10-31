@@ -142,48 +142,50 @@ class _HistoryPageState extends State<HistoryPage> {
       body: ListView.builder(
         itemCount: attendanceHistory.length,
         itemBuilder: (context, index) {
-          Map<String, Object?> record = attendanceHistory[index];
+          final record = attendanceHistory[index];
+          final eventDate = DateTime.parse(record['event_date'] as String);
           return Card(
-            margin: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 6,
-            ),
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
                 color: Theme.of(context).colorScheme.outline,
-              width: 1,
+                width: 1,
               ),
             ),
-          child: ListTile(
-            leading: const Icon(Icons.check_circle),
-            title: Text(record['event_name'] as String),
-            subtitle: const Text('Attended'),
-            onTap: () {
-              viewEventDetails(record['event_id'] as int);
-            },
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  tooltip: 'Cancel attendance',
-                  onPressed: () {
-                    confirmDeleteAttendance(record['id'] as int);
-                  },
-                ),
-                const SizedBox(width: 16),
+            child: ListTile(
+              leading: const Icon(Icons.check_circle),
+              title: Text(record['event_name'] as String),
+              subtitle: Text(
+                'Attended\n'
+                '${eventDate.month}/${eventDate.day}/${eventDate.year} '
+                'at ${TimeOfDay.fromDateTime(eventDate).format(context)}',
+              ),
+              onTap: () {
+                viewEventDetails(record['event_id'] as int);
+              },
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    tooltip: 'Cancel attendance',
+                    onPressed: () {
+                      confirmDeleteAttendance(record['id'] as int);
+                    },
+                  ),
+                  const SizedBox(width: 16),
 
-                IconButton(
-                  icon: const Icon(Icons.delete_forever),
-                  tooltip: 'Permanently delete event',
-                  onPressed: () {
-                    permanentlyDeleteEvent(record['event_id'] as int);
-                  },
-                ),
-              ],
+                  IconButton(
+                    icon: const Icon(Icons.delete_forever),
+                    tooltip: 'Permanently delete event',
+                    onPressed: () {
+                      permanentlyDeleteEvent(record['event_id'] as int);
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
           );
         },
       ),

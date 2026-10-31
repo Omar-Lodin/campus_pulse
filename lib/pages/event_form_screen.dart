@@ -28,6 +28,8 @@ class _EventFormScreenState extends State<EventFormScreen> {
 
   String category = 'Academic';
 
+  TimeOfDay selectedTime = const TimeOfDay(hour: 12, minute: 0);
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +43,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
       category = widget.event!.category;
       date = widget.event!.date;
       notesController.text = widget.event!.notes;
+      selectedTime = TimeOfDay.fromDateTime(widget.event!.date);
     }
 
     monthController.text = date.month.toString();
@@ -55,7 +58,13 @@ class _EventFormScreenState extends State<EventFormScreen> {
       int day = int.parse(dayController.text.trim());
       int year = int.parse(yearController.text.trim());
 
-      DateTime eventDate = DateTime(year, month, day);
+      DateTime eventDate = DateTime(
+        year,
+        month,
+        day,
+        selectedTime.hour,
+        selectedTime.minute,
+      );
 
       if (eventDate.month != month ||
           eventDate.day != day ||
@@ -108,6 +117,18 @@ class _EventFormScreenState extends State<EventFormScreen> {
     yearController.dispose();
     notesController.dispose();
     super.dispose();
+  }
+
+  Future<void> selectTime() async {
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+    );
+    if (!mounted || pickedTime == null) return;
+
+    setState(() {
+      selectedTime = pickedTime;
+    });
   }
 
   @override
@@ -249,7 +270,14 @@ class _EventFormScreenState extends State<EventFormScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 14,),
+              const SizedBox(height: 14),
+              OutlinedButton(
+                onPressed: selectTime,
+                child: Text(
+                  'Event Start Time: ${selectedTime.format(context)}',
+                ),
+              ),
+              const SizedBox(height: 14),
               TextFormField(
                 controller: notesController,
                 decoration: const InputDecoration(
