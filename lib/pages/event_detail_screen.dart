@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '/models/event.dart';
 
@@ -7,6 +6,7 @@ class EventDetailScreen extends StatelessWidget {
   final VoidCallback onAttend;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback? onTogglePlanned;
 
   const EventDetailScreen({
     super.key,
@@ -14,6 +14,7 @@ class EventDetailScreen extends StatelessWidget {
     required this.onAttend,
     required this.onEdit,
     required this.onDelete,
+    this.onTogglePlanned,
   });
 
   void confirmDelete(BuildContext context) {
@@ -81,7 +82,7 @@ class EventDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             if(event.notes.isNotEmpty) ...[
-              const SizedBox(height: 16),
+              
               const Text(
                 'Personal Notes',
                 style: TextStyle(
@@ -89,10 +90,15 @@ class EventDetailScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(event.notes),
             ],
-            const SizedBox(height: 20),
+            if (onTogglePlanned != null) ...[
+              const SizedBox(height: 8),
+              ElevatedButton(onPressed: onTogglePlanned, child: Text(event.isPlanned ? 'Cancel Plan' : 'Mark Planned',),),
+            const SizedBox(height: 8),
+            ],
+            
             ElevatedButton(
               onPressed: onAttend,
               child: const Text('Mark Attended'),

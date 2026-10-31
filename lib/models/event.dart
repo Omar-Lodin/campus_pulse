@@ -8,6 +8,7 @@ class CampusEvent {
   DateTime date;
   String notes;
   final int? capacity;
+  final bool isPlanned;
 
   CampusEvent({
     this.id,
@@ -18,6 +19,7 @@ class CampusEvent {
     required this.date,
     this.notes = '',
     this.capacity,
+    this.isPlanned = false,
   });
 
   Map<String, Object?> toMap() {
@@ -29,6 +31,7 @@ class CampusEvent {
       'date': date.toIso8601String(),
       'notes': notes,
       'capacity': capacity,
+      'is_planned': isPlanned ? 1 : 0,
     };
   }
 
@@ -42,6 +45,7 @@ class CampusEvent {
       date: DateTime.parse(map['date'] as String),
       notes: map['notes'] as String? ?? '',
       capacity: map['capacity'] as int?,
+      isPlanned: (map['is_planned'] as int? ?? 0) == 1,
     );
   }
 }

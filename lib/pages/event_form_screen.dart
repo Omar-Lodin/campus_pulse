@@ -85,6 +85,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
         date: eventDate,
         notes: notesController.text.trim(),
         capacity: int.tryParse(capacityController.text.trim()),
+        isPlanned: widget.event?.isPlanned ?? false,
       );
 
       Navigator.pop(context, event);

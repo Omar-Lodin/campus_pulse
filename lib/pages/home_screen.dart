@@ -110,6 +110,13 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context) {
           return EventDetailScreen(
             event: event,
+            onTogglePlanned: () async {
+              if (event.id == null) return;
+              await DatabaseHelper.setEventPlanned(event.id!, !event.isPlanned);
+              if (!mounted || !context.mounted) return;
+              Navigator.pop(context);
+              await loadData();
+            },
             onAttend: () {
               markAttendance(event);
             },
@@ -145,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                'Events Planned: ${events.length}',
+                'Events Planned: ${events.where((event)=>event.isPlanned).length}',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -199,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: Row(
                     children: [
                       Expanded(child: Text(event.name)),
-                      const Chip(label: Text('Planned')),
+                      if (event.isPlanned) const Chip(label: Text('Planned')),
                     ],
                   ),
                   subtitle: Text(
