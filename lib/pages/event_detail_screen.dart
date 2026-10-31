@@ -67,10 +67,24 @@ class EventDetailScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text('Category: ${event.category}'),
             const SizedBox(height: 8),
+            
             Text(
               'Date: ${event.date.month}/'
               '${event.date.day}/${event.date.year}',
             ),
+            const SizedBox(height: 8),
+            if(event.notes.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              const Text(
+                'Personal Notes',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(event.notes),
+            ],
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: onAttend,
