@@ -58,7 +58,13 @@ class _EventFormScreenState extends State<EventFormScreen> {
       int day = int.parse(dayController.text.trim());
       int year = int.parse(yearController.text.trim());
 
-      DateTime eventDate = DateTime(year, month, day);
+      DateTime eventDate = DateTime(
+        year,
+        month,
+        day,
+        selectedTime.hour,
+        selectedTime.minute,
+      );
 
       if (eventDate.month != month ||
           eventDate.day != day ||
